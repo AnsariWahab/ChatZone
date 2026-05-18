@@ -1,14 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Ad } from '../types';
-import { defaultAds } from '../data/defaultAds';
+import { defaultAds, ADS_VERSION } from '../data/defaultAds';
 import { v4 as uuidv4 } from 'uuid';
 
 const ADS_KEY = 'chatroom_ads';
+const ADS_VERSION_KEY = 'chatroom_ads_version';
 
 function getStoredAds(): Ad[] {
   try {
+    const storedVersion = localStorage.getItem(ADS_VERSION_KEY);
+
+    // If version changed or no version stored, reset to new default ads
+    if (storedVersion !== ADS_VERSION) {
+      localStorage.setItem(ADS_KEY, JSON.stringify(defaultAds));
+      localStorage.setItem(ADS_VERSION_KEY, ADS_VERSION);
+      return defaultAds;
+    }
+
     const stored = localStorage.getItem(ADS_KEY);
     if (stored) return JSON.parse(stored);
+
     localStorage.setItem(ADS_KEY, JSON.stringify(defaultAds));
     return defaultAds;
   } catch {
